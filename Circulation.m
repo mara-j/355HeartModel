@@ -64,9 +64,9 @@ classdef Circulation
             if  (x(2) > x(1))     % Complete for filling
                 A = obj.filling_phase_dynamic_matrix(t);
             elseif (x(1) > x(3))  % Complete for ejection
-                A = ejection_phase_dynamic_matrix(t)
+                A = ejection_phase_dynamic_matrix(t);
             else                  % isovolumetric
-                A = filling_phase_dynamic_matrix
+                A = filling_phase_dynamic_matrix(t);
             end
             
             %%% End of Write Code for Task 2
@@ -160,8 +160,16 @@ classdef Circulation
             
             % WRITE  YOUR CODE HERE
             % Put all the blood in the atria as an initial condition.
+            fun = @(t, x) get_derivative(obj, t, x);
             
+            time_span = [0 total_time];
             
+            % Put all the blood in the atria as an initial condition.
+            % Non slack blood vol in ml, C2 is left atrial compliance       
+            initial_conditions = [0 (obj.non_slack_blood_volume/obj.C2) 0 0];
+            
+            [time, y] = ode45(fun, time_span, initial_conditions);
+
         end
         
         function [normalized_time] = get_normalized_time(obj, t)

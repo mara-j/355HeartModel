@@ -61,12 +61,12 @@ classdef Circulation
             %  Implement this by deciding whether the model is in a filling, ejecting, or isovolumic phase and using
             %  the corresponding dynamic matrix.
             
-            if  % Complete for filling
+            if  (x(2) > x(1))     % Complete for filling
                 A = obj.filling_phase_dynamic_matrix(t);
-            elseif % Complete for ejection
-                A = 
-            else % isovolumetric
-                A = 
+            elseif (x(1) > x(3))  % Complete for ejection
+                A = ejection_phase_dynamic_matrix(t);
+            else                  % isovolumetric
+                A = filling_phase_dynamic_matrix(t);
             end
             
             %%% End of Write Code for Task 2
@@ -116,8 +116,8 @@ classdef Circulation
 
               A = [del_dt/el, el/obj.R2, 0, 0;
                   1/(obj.R2*obj.C2), -(obj.R1+obj.R2)/(obj.C2*obj.R1*obj.R2), 1/(obj.R1*obj.C2), 0;
-                  0, 1/(obj.R1*obj.C3), -(1/(obj.R1*obj.C3)),
-                  ]
+                  0, 1/(obj.R1*obj.C3), -(1/(obj.R1*obj.C3)), 0;
+                  0, 0, 0, 0]
         end
         
         function [time_varying_elastance] = elastance(obj, t)
@@ -160,7 +160,11 @@ classdef Circulation
             
             % WRITE  YOUR CODE HERE
             % Put all the blood in the atria as an initial condition.
+            t_span = [0 total_time]
             
+            % C2 is left atrial compliance, non slack blood vol in ml
+            initial_conditions = [0 (obj.non_slack_blood_volume/obj.C2) 0 0];
+
             
         end
         
