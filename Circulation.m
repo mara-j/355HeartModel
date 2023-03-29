@@ -166,7 +166,7 @@ classdef Circulation
             
             % Put all the blood in the atria as an initial condition.
             % Non slack blood vol in ml, C2 is left atrial compliance       
-            initial_conditions = [0 (obj.non_slack_blood_volume/obj.C2) 0 0];
+            initial_conditions = [0, (obj.non_slack_blood_volume/obj.C2), 0, 0];
             
             [time, y] = ode45(fun, time_span, initial_conditions);
 
