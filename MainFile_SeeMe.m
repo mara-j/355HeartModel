@@ -9,18 +9,28 @@ T = 5;
 
 %%% TASK 4
 % Do the necessary calculation (if required, this may be based on Q (4th state)) and then generate the desired plots.
+% Q is flow rate (similar to current in electrical systems) 
 
+ventricular_pressure = state(:,1);
+atrial_pressure = state(:,2);
+arterial_pressure = state(:,3);
+aortic_pressure = zeros(size(state(:,4)));
 
+% Calculations for aortic pressure just outside the aortic valve
+% over time span 
+for i = 1:length(time)
+    q_dot = circulation_model.get_derivative(time(i), transpose(state(i,:)));
+    aortic_pressure(i) = state(i,3) + circulation_model.R4*state(i,4) + circulation_model.L.*q_dot(4);
+end
 
-%%% Plotting
+%%% Plotting all pressures just outside the aortic valve over time span
 figure()
 LineWidth = 1.5;
 FontSize = 12;
-% Your plotting code should be here
-%plot(....
-%plot(....
-%plot(....
-%plot(....
+plot(time, ventricular_pressure, 'LineWidth', LineWidth), hold on;
+plot(time, atrial_pressure, 'LineWidth', LineWidth);
+plot(time, arterial_pressure, 'LineWidth', LineWidth);
+plot(time, aortic_pressure, 'LineWidth', LineWidth), hold off;
 
 legend('ventricular', 'atrial', 'arterial', 'aortic') % note the order here
 xlabel('Time (seconds)')
