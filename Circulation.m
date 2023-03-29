@@ -61,12 +61,12 @@ classdef Circulation
             %  Implement this by deciding whether the model is in a filling, ejecting, or isovolumic phase and using
             %  the corresponding dynamic matrix.
             
-            if  % Complete for filling
+            if  (x(2) > x(1))     % Complete for filling
                 A = obj.filling_phase_dynamic_matrix(t);
-            elseif % Complete for ejection
-                A = 
-            else % isovolumetric
-                A = 
+            elseif (x(1) > x(3))  % Complete for ejection
+                A = ejection_phase_dynamic_matrix(t)
+            else                  % isovolumetric
+                A = filling_phase_dynamic_matrix
             end
             
             %%% End of Write Code for Task 2
