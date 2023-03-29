@@ -60,14 +60,22 @@ classdef Circulation
             % WRITE YOUR CODE HERE for Task 2
             %  Implement this by deciding whether the model is in a filling, ejecting, or isovolumic phase and using
             %  the corresponding dynamic matrix.
-            
-            if  (x(2) > x(1))     % Complete for filling
+
+            % Filling phase: Atrial pressure higher than ventricular
+            if (x(2) > x(1))
                 A = obj.filling_phase_dynamic_matrix(t);
-            elseif (x(1) > x(3))  % Complete for ejection
-                A = ejection_phase_dynamic_matrix(t);
-            else                  % isovolumetric
-                A = filling_phase_dynamic_matrix(t);
+
+            % Ejection Phase: Ventricular pressure higher than aortic
+            % Ventricular > Aortic
+            elseif (x(1) > x(3)) 
+                A = obj.ejection_phase_dynamic_matrix(t);
+
+             % Isovolumetric Phase: Otherwise
+            else
+                A = obj.isovolumic_phase_dynamic_matrix(t);
             end
+                  
+            state_derivatives = A*x;
             
             %%% End of Write Code for Task 2
         end
@@ -81,6 +89,7 @@ classdef Circulation
             
             el = obj.elastance(t);
             del_dt = obj.elastance_finite_difference(t);
+
             A = [del_dt/el, 0, 0, 0
                 0, -1/(obj.R1*obj.C2), 1/(obj.R1*obj.C2), 0
                 0, 1/(obj.R1*obj.C3), -1/(obj.R1*obj.C3), 0
@@ -96,6 +105,7 @@ classdef Circulation
             
             el = obj.elastance(t);
             del_dt = obj.elastance_finite_difference(t);
+
             A = [del_dt/el, 0, 0, -el
                 0, -1/(obj.R1*obj.C2), 1/(obj.R1*obj.C2), 0
                 0, 1/(obj.R1*obj.C3), -1/(obj.R1*obj.C3), 1/obj.C3
@@ -111,13 +121,14 @@ classdef Circulation
             % A matrix for filling phase
             
             % WRITE YOUR CODE HERE
-             el = obj.elastance(t);
-             del_dt = obj.elastance_finite_difference(t);
+            el = obj.elastance(t);
+            del_dt = obj.elastance_finite_difference(t);
+            
+            A = [(del_dt/el) - (el/obj.R2), el/obj.R2, 0, 0
+                1/(obj.R2*obj.C2), -(obj.R1+obj.R2)/(obj.C2*obj.R1*obj.R2), 1/(obj.R1*obj.C2), 0
+                0, 1/(obj.R1*obj.C3), -1/(obj.R1*obj.C3), 0
+                0, 0, 0, 0];
 
-              A = [del_dt/el, el/obj.R2, 0, 0;
-                  1/(obj.R2*obj.C2), -(obj.R1+obj.R2)/(obj.C2*obj.R1*obj.R2), 1/(obj.R1*obj.C2), 0;
-                  0, 1/(obj.R1*obj.C3), -(1/(obj.R1*obj.C3)), 0;
-                  0, 0, 0, 0]
         end
         
         function [time_varying_elastance] = elastance(obj, t)
@@ -160,16 +171,13 @@ classdef Circulation
             
             % WRITE  YOUR CODE HERE
             % Put all the blood in the atria as an initial condition.
-            fun = @(t, x) get_derivative(obj, t, x);
+            funode = @(t, x) get_derivative(obj, t, x);
             
             time_span = [0 total_time];
+            initial_conditions = [0, obj.non_slack_blood_volume/obj.C2, 0, 0];
             
-            % Put all the blood in the atria as an initial condition.
-            % Non slack blood vol in ml, C2 is left atrial compliance       
-            initial_conditions = [0, (obj.non_slack_blood_volume/obj.C2), 0, 0];
+            [time, y] = ode45(funode, time_span, initial_conditions);       
             
-            [time, y] = ode45(fun, time_span, initial_conditions);
-
         end
         
         function [normalized_time] = get_normalized_time(obj, t)
