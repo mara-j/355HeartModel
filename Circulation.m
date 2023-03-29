@@ -111,7 +111,13 @@ classdef Circulation
             % A matrix for filling phase
             
             % WRITE YOUR CODE HERE
+             el = obj.elastance(t);
+             del_dt = obj.elastance_finite_difference(t);
 
+              A = [del_dt/el, el/obj.R2, 0, 0;
+                  1/(obj.R2*obj.C2), -(obj.R1+obj.R2)/(obj.C2*obj.R1*obj.R2), 1/(obj.R1*obj.C2), 0;
+                  0, 1/(obj.R1*obj.C3), -(1/(obj.R1*obj.C3)), 0;
+                  0, 0, 0, 0]
         end
         
         function [time_varying_elastance] = elastance(obj, t)
