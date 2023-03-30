@@ -67,7 +67,7 @@ classdef Circulation
 
             % Ejection Phase: Ventricular pressure higher than aortic
             % Ventricular > Aortic
-            elseif (x(1) > x(3)) 
+            elseif (x(1) > x(3)) || x(4) > 0
                 A = obj.ejection_phase_dynamic_matrix(t);
 
              % Isovolumetric Phase: Otherwise
