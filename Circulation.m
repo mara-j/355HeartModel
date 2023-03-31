@@ -33,14 +33,17 @@ classdef Circulation
                 obj.Emin = Emin_;
                 
                 obj.non_slack_blood_volume = 250; %# ml
-                obj.R1 = 1.0; %# between 0.5 and 2
+                % Resistances (mmHg.sec/ml)
+                obj.R1 = 1.0;                     %# between 0.5 and 2
                 obj.R2 = 0.005;
                 obj.R3 = 0.001;
                 obj.R4 = 0.0398;
                 
+                % Compliances (ml/mmHg)
                 obj.C2 = 4.4;
                 obj.C3 = 1.33;
                 
+                % Inertance (mmHg.sec^2/ml)
                 obj.L = 0.0005;
             end
         end
@@ -176,10 +179,32 @@ classdef Circulation
             time_span = [0 total_time];
             initial_conditions = [0, obj.non_slack_blood_volume/obj.C2, 0, 0];
             
-            [time, y] = ode45(funode, time_span, initial_conditions);       
-            
+            [time, y] = ode45(funode, time_span, initial_conditions);  
+           
+            % verifying ode solver
+            % [time, y] = ode15s(funode, time_span, initial_conditions); 
+            %[time, y] = ode23(funode, time_span, initial_conditions);
         end
         
+%         function [time, y] = explicit_euler( obj , total_time)
+%             delta_t = 0.1;
+%             t_span = 0:delta_t:total_time;
+%             initial_conditions = [0, obj.non_slack_blood_volume/obj.C2, 0, 0];
+% 
+%         x_em = zeros(length(intial_conditions),length(t_span));
+%         x_em(:,1) = intitial_conditions;
+%             for t = 1:length(t_span) - 1
+%                 x_dot = @(t, x) get_derivative(obj, t, x);
+%                 x_em(:,t+1) = x_em(:,t) + (x_dot*delta_t);
+%             end
+% 
+%         plot(time_span, x_em(1,:), 'r', 'LineWidth', 1.5), hold on
+%         legend('Eulers');
+%         xlabel('Time (sec)', ylabel('x_1'), set(gca, 'FontSize',12) hold off;
+% 
+%         end 
+
+
         function [normalized_time] = get_normalized_time(obj, t)
             % Inputs
             % t: time

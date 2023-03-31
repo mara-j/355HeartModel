@@ -7,6 +7,8 @@ circulation_model = Circulation(75, 2, 0.06);
 T = 5;
 [time, state] = circulation_model.simulate(T);
 
+% [time, state] = circulation_model.explicit_euler(T);
+
 %%% TASK 4
 % Do the necessary calculation (if required, this may be based on Q (4th state)) and then generate the desired plots.
 % Q is flow rate (similar to current in electrical systems) 
