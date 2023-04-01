@@ -45,6 +45,17 @@ classdef Circulation
                 
                 % Inertance (mmHg.sec^2/ml)
                 obj.L = 0.0005;
+
+                % Sensitivity analysis
+%                 obj.R1 = 2.0;
+%                 obj.R2 = 0.001;
+%                 obj.R3 = 0.0009;
+%                 obj.R4 = 0.05;
+
+%                 obj.C2 = 5.5;
+%                 obj.C3 = 2.0;
+%                 obj.L = 0.005;
+  
             end
         end
         
@@ -68,8 +79,8 @@ classdef Circulation
             if (x(2) > x(1))
                 A = obj.filling_phase_dynamic_matrix(t);
 
-            % Ejection Phase: Ventricular pressure higher than aortic
-            % Ventricular > Aortic
+            % Ejection Phase: Ventricular pressure higher than aortic and
+            % aortic inflow  > 0 
             elseif (x(1) > x(3)) || x(4) > 0
                 A = obj.ejection_phase_dynamic_matrix(t);
 
@@ -174,36 +185,18 @@ classdef Circulation
             
             % WRITE  YOUR CODE HERE
             % Put all the blood in the atria as an initial condition.
-            funode = @(t, x) get_derivative(obj, t, x);
+            odefun = @(t, x) get_derivative(obj, t, x);
             
             time_span = [0 total_time];
             initial_conditions = [0, obj.non_slack_blood_volume/obj.C2, 0, 0];
             
-            [time, y] = ode45(funode, time_span, initial_conditions);  
+            [time, y] = ode45(odefun, time_span, initial_conditions);  
            
-            % verifying ode solver
+            % Verifying ode solver
             % [time, y] = ode15s(funode, time_span, initial_conditions); 
-            %[time, y] = ode23(funode, time_span, initial_conditions);
+            % [time, y] = ode23(funode, time_span, initial_conditions);
         end
         
-%         function [time, y] = explicit_euler( obj , total_time)
-%             delta_t = 0.1;
-%             t_span = 0:delta_t:total_time;
-%             initial_conditions = [0, obj.non_slack_blood_volume/obj.C2, 0, 0];
-% 
-%         x_em = zeros(length(intial_conditions),length(t_span));
-%         x_em(:,1) = intitial_conditions;
-%             for t = 1:length(t_span) - 1
-%                 x_dot = @(t, x) get_derivative(obj, t, x);
-%                 x_em(:,t+1) = x_em(:,t) + (x_dot*delta_t);
-%             end
-% 
-%         plot(time_span, x_em(1,:), 'r', 'LineWidth', 1.5), hold on
-%         legend('Eulers');
-%         xlabel('Time (sec)', ylabel('x_1'), set(gca, 'FontSize',12) hold off;
-% 
-%         end 
-
 
         function [normalized_time] = get_normalized_time(obj, t)
             % Inputs

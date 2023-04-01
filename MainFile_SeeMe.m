@@ -5,6 +5,7 @@ clc
 circulation_model = Circulation(75, 2, 0.06);
 
 T = 5;
+% T = 10;
 [time, state] = circulation_model.simulate(T);
 
 % [time, state] = circulation_model.explicit_euler(T);
@@ -21,8 +22,8 @@ aortic_pressure = zeros(size(state(:,4)));
 % Calculations for aortic pressure just outside the aortic valve
 % over time span 
 for i = 1:length(time)
-    q_dot = circulation_model.get_derivative(time(i), transpose(state(i,:)));
-    aortic_pressure(i) = state(i,3) + circulation_model.R4*state(i,4) + circulation_model.L.*q_dot(4);
+    x_dot = circulation_model.get_derivative(time(i), transpose(state(i,:)));
+    aortic_pressure(i) = state(i,3) + circulation_model.R4*state(i,4) + circulation_model.L.*x_dot(4);
 end
 
 %%% Plotting all pressures just outside the aortic valve over time span

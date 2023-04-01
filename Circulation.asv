@@ -33,17 +33,17 @@ classdef Circulation
                 obj.Emin = Emin_;
                 
                 obj.non_slack_blood_volume = 250; %# ml
-                % Resistance Units: mmHg*sec / ml
-                obj.R1 = 1.0; %# between 0.5 and 2
+                % Resistances (mmHg.sec/ml)
+                obj.R1 = 1.0;                     %# between 0.5 and 2
                 obj.R2 = 0.005;
                 obj.R3 = 0.001;
                 obj.R4 = 0.0398;
                 
-                % Compliance Units: ml/mmHg
+                % Compliances (ml/mmHg)
                 obj.C2 = 4.4;
                 obj.C3 = 1.33;
                 
-                % Inertance Units: mmHg.sec^2 /ml
+                % Inertance (mmHg.sec^2/ml)
                 obj.L = 0.0005;
 
                 % sensitivity analysis
@@ -52,10 +52,10 @@ classdef Circulation
 %                 obj.R3 = 0.0009;
 %                 obj.R4 = 0.05;
 
-%                 obj.C2 = 4.0;
-%                 obj.C3 = 1.5;
+%                 obj.C2 = 5.5;
+%                 obj.C3 = 2.0;
 %                 obj.L = 0.005;
-
+  
             end
         end
         
@@ -79,17 +79,18 @@ classdef Circulation
             if (x(2) > x(1))
                 A = obj.filling_phase_dynamic_matrix(t);
 
-            % Ejection Phase: Ventricular pressure higher than aortic and aortic inflow greater than 0
-            elseif (x(1) > x(3)) || (x(4) > 0)
+            % Ejection Phase: Ventricular pressure higher than aortic and
+            % aortic inflow  > 0 
+            elseif (x(1) > x(3)) || x(4) > 0
                 A = obj.ejection_phase_dynamic_matrix(t);
 
-            % Isovolumetric Phase: Otherwise
+             % Isovolumetric Phase: Otherwise
             else
                 A = obj.isovolumic_phase_dynamic_matrix(t);
             end
                   
             state_derivatives = A*x;
-
+            
             %%% End of Write Code for Task 2
         end
         
@@ -184,19 +185,19 @@ classdef Circulation
             
             % WRITE  YOUR CODE HERE
             % Put all the blood in the atria as an initial condition.
-            funOde = @(t, x) get_derivative(obj, t, x);
+            odefun = @(t, x) get_derivative(obj, t, x);
             
             time_span = [0 total_time];
             initial_conditions = [0, obj.non_slack_blood_volume/obj.C2, 0, 0];
             
-            [time, y] = ode45(funOde, time_span, initial_conditions);       
-            
-            % verifying ode solver
+            [time, y] = ode45(odefun, time_span, initial_conditions);  
+           
+            % Verifying ode solver
             % [time, y] = ode15s(funode, time_span, initial_conditions); 
-            %[time, y] = ode23(funode, time_span, initial_conditions);
-
+            % [time, y] = ode23(funode, time_span, initial_conditions);
         end
         
+
         function [normalized_time] = get_normalized_time(obj, t)
             % Inputs
             % t: time
